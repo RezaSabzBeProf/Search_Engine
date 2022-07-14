@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SearchEngine.Datalayer.Context;
 
@@ -10,9 +11,10 @@ using SearchEngine.Datalayer.Context;
 namespace SearchEngine.Datalayer.Migrations
 {
     [DbContext(typeof(EngineDbContext))]
-    partial class EngineDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220714132457_mig_update_image")]
+    partial class mig_update_image
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

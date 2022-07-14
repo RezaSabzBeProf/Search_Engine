@@ -19,7 +19,17 @@ namespace SearchEngine.Web.Controllers
         public IActionResult Search(string q)
         {
             var model = _pageService.Search(q);
+            ViewBag.q = q;
+            ViewBag.IsImage = false;
             return View("Index",model);
+        }
+        [HttpGet]
+        public IActionResult SearchImage(string q)
+        {
+            var model = _pageService.SearchImage(q);
+            ViewBag.IsImage = true;
+            ViewBag.q = q;
+            return View("Index", model);
         }
     }
 }

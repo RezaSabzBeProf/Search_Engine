@@ -10,5 +10,7 @@ namespace SearchEngine.Core.Service.Interface
     public interface IPageService
     {
         List<Page> Search(string q);
+
+        List<Page> SearchImage(string q);
     }
 }

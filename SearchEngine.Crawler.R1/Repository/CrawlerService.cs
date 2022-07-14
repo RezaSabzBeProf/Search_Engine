@@ -15,8 +15,39 @@ namespace SearchEngine.Crawler.R1.Repository
         public CrawlerService()
         {
             var option = new DbContextOptionsBuilder<EngineDbContext>();
-            option.UseSqlServer(@"Server=.;Database=SearchEngine_Database;Trusted_Connection=True;");
+            option.UseSqlServer(@"Server=.;Database=SearchEngine_Database_Image;Trusted_Connection=True;");
             _context = new EngineDbContext(option.Options);
+        }   
+
+        public void AddNewImages(Tuple<List<string>, List<string>> links,string url)
+        {
+            int i = 0;
+            foreach (var item in links.Item1)
+            {
+                if (_context.Pages.Any(p => p.url == item))
+                {
+
+                }
+                else
+                {
+                    string title = links.Item2[i];
+                    if(title == null)
+                    {
+                        title = "none";
+                    }
+                    _context.Pages.Add(new Page
+                    {
+                        title = title,
+                        url = item,
+                        area = "none",
+                        IsDone = false,
+                        IsImage = true,
+                        ImagePageUrl = url
+                    });
+                }
+                i++;
+            }
+            _context.SaveChanges();
         }
 
         public void AddNewLinks(List<string> links)
@@ -35,6 +66,7 @@ namespace SearchEngine.Crawler.R1.Repository
                         url = item,
                         area = "none",
                         IsDone = false,
+                        ImagePageUrl = "none"
                     });
                 }
                 
@@ -48,12 +80,13 @@ namespace SearchEngine.Crawler.R1.Repository
         }
         public void UpdatePage(Page page) 
         {
-            var item = _context.Pages.SingleOrDefault(p => p.url == page.url);
+            var item = _context.Pages.Where(p => p.url == page.url).Take(1).SingleOrDefault();
             if(item != null)
             {
                 item.IsDone = true;
                 item.area = page.area;
                 item.title = page.title;
+                item.IsImage = page.IsImage;
             }
             _context.Update(item);
             _context.SaveChanges();

@@ -23,7 +23,7 @@ namespace SearchEngine.Core.Service
 
         public List<Page> Search(string q)
         {
-            var model1 = _context.Pages.Where(p=> p.IsDone == true && p.title.Contains(q)).Take(3);
+            var model1 = _context.Pages.Where(p=> p.IsDone == true && p.IsImage == false && p.title.Contains(q)).Take(3);
             string area1 = PredictIssue(new SearchEngineIssue
             {
                 Title = q,
@@ -35,8 +35,8 @@ namespace SearchEngine.Core.Service
             {
                 area2 = first.area;
             }
-            var model2 = _context.Pages.Where(p => p.IsDone == true && p.area.Contains(area1)).Take(3);
-            var model3 = _context.Pages.Where(p => p.IsDone == true && p.area.Contains(area2)).Take(3);
+            var model2 = _context.Pages.Where(p => p.IsDone == true && p.IsImage == false && p.area.Contains(area1)).Take(3);
+            var model3 = _context.Pages.Where(p => p.IsDone == true && p.IsImage == false && p.area.Contains(area2)).Take(3);
             List<Page> result = new List<Page>();
             foreach (var page in model1)
                 result.Add(new Page
@@ -57,11 +57,57 @@ namespace SearchEngine.Core.Service
                 {
                     title = page.title,
                     area = page.area,
-                    url = page.url
+                    url = page.url,
                 });
 
             return result;
         }
+
+        public List<Page> SearchImage(string q)
+        {
+            var model1 = _context.Pages.Where(p => p.IsDone == true && p.IsImage == true && p.title.Contains(q)).Take(3);
+            string area1 = PredictIssue(new SearchEngineIssue
+            {
+                Title = q,
+                Description = q
+            });
+            var first = model1.Take(1).SingleOrDefault();
+            string area2 = "";
+            if (first != null && first.area != "null")
+            {
+                area2 = first.area;
+            }
+            var model2 = _context.Pages.Where(p => p.IsDone == true && p.IsImage == true && p.area.Contains(area1)).Take(3);
+            var model3 = _context.Pages.Where(p => p.IsDone == true && p.IsImage == true && p.area.Contains(area2)).Take(3);
+            List<Page> result = new List<Page>();
+            foreach (var page in model1)
+                result.Add(new Page
+                {
+                    title = page.title,
+                    area = page.area,
+                    url = page.url,
+                    ImagePageUrl = page.ImagePageUrl
+                });
+            foreach (var page in model2)
+                result.Add(new Page
+                {
+                    title = page.title,
+                    area = page.area,
+                    url = page.url,
+                    ImagePageUrl = page.ImagePageUrl
+                });
+            foreach (var page in model3)
+                result.Add(new Page
+                {
+                    title = page.title,
+                    area = page.area,
+                    url = page.url,
+                    ImagePageUrl = page.ImagePageUrl
+                });
+
+            return result;
+        }
+
         string PredictIssue(SearchEngineIssue singleIssue)
 {
             string _appPath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);

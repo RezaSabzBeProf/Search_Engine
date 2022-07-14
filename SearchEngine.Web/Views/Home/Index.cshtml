@@ -7,6 +7,10 @@
 
 <div class="text-center">
     <h1 class="display-4">farslearn.com search engine</h1>
+    <div class="row">
+        <a asp-controller="home" asp-action="search" asp-route-q="@ViewBag.q">article</a>
+        <a asp-controller="home" asp-action="searchimage" asp-route-q="@ViewBag.q">image</a>
+    </div>
     <form asp-controller="home" asp-action="search" method="get">
 
             <div class="form-group">
@@ -19,15 +23,35 @@
 
     </form>
 </div>
-
 @if(Model != null)
 {
-    foreach (var item in Model)
+    if(ViewBag.IsImage)
     {
-        <h3><a href="@item.url">@item.title</a></h3>
-        <span>@item.area</span>
-        <hr>
+        foreach (var item in Model)
+        {
+            <a href="@item.url">
+                <img width="250" height="250" src="@item.url" />
+            </a>
+            <br />
+            <a href="@item.ImagePageUrl">
+                Show Article
+            </a>
+            <span>@item.title</span>
+            <span>@item.area</span>
+
+            <hr />
+        }
     }
+    else
+    {
+        foreach (var item in Model)
+        {
+            <h3><a href="@item.url">@item.title</a></h3>
+            <span>@item.area</span>
+            <hr>
+        }
+    }
+   
 }
 
 <footer style="auto">

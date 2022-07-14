@@ -14,5 +14,6 @@ namespace SearchEngine.Crawler.R1.Repository
         void AddNewLinks(List<string> links);
 
         void UpdatePage(Page page);
+        void AddNewImages(Tuple<List<string>, List<string>> links,string url);
     }
 }

@@ -18,40 +18,63 @@ PredictionEngine<SearchEngineIssue, IssuePrediction> _predEngine;
 
 _mlContext = new MLContext(seed: 0);
 
-
 var pageList = _crawlerService.GetAllPageNotDone();
 foreach (var page in pageList)
 {
-    //R1CrawlerEngine r1CrawlerEngine = new R1CrawlerEngine(page.url);
-    string html = GetHtmlFromPage(page.url);
-    string h1Text = GetPageH1(html);
-    List<string> links = GetAllPageLink(html);
-    string metaDesc = GetMetaDesc(html);
-    AddSomeNewLinks(links);
-    SearchEngineIssue mlModel = new SearchEngineIssue();
-    if(h1Text == "error")
+    if(page.IsImage)
     {
-        UpdateThisPage(new Page
-        {
-            title = "none",
-            url = page.url,
-            IsDone = true,
-            area = "none"
-        });
-    }
-    else
-    {
-        mlModel.Title = h1Text;
+        string html = GetHtmlFromPage(page.ImagePageUrl);
+        string metaDesc = GetMetaDesc(html);
+        SearchEngineIssue mlModel = new SearchEngineIssue();
+        mlModel.Title = page.title;
         mlModel.Description = metaDesc;
         string area = PredictIssue(mlModel);
         UpdateThisPage(new Page
         {
-            title = h1Text,
+            title = page.title,
             url = page.url,
             IsDone = true,
-            area = area
+            area = area,
+            IsImage = true
         });
     }
+    else
+    {
+        //R1CrawlerEngine r1CrawlerEngine = new R1CrawlerEngine(page.url);
+        string html = GetHtmlFromPage(page.url);
+        string h1Text = GetPageH1(html);
+        var imageLinksAndTitles = GetPageImageLinks(html);
+        AddSomeNewImages(imageLinksAndTitles,page.url);
+        List<string> links = GetAllPageLink(html);
+        string metaDesc = GetMetaDesc(html);
+        AddSomeNewLinks(links);
+        SearchEngineIssue mlModel = new SearchEngineIssue();
+        if (h1Text == "error")
+        {
+            UpdateThisPage(new Page
+            {
+                title = "none",
+                url = page.url,
+                IsDone = true,
+                area = "none"
+            });
+        }
+        else
+        {
+            mlModel.Title = h1Text;
+            mlModel.Description = metaDesc;
+            string area = PredictIssue(mlModel);
+            UpdateThisPage(new Page
+            {
+                title = h1Text,
+                url = page.url,
+                IsDone = true,
+                area = area,
+            });
+
+        }
+    }
+   
     
 }
 
@@ -59,6 +82,10 @@ foreach (var page in pageList)
 void AddSomeNewLinks(List<string> links)
 {
     _crawlerService.AddNewLinks(links);
+}
+void AddSomeNewImages(Tuple<List<string>, List<string>> links,string url)
+{
+    _crawlerService.AddNewImages(links,url);
 }
 void UpdateThisPage(Page page)
 {
@@ -160,6 +187,30 @@ string GetMetaDesc(string html)
     catch
     {
         return "none";
+    }
+
+
+}
+Tuple<List<string>, List<string>> GetPageImageLinks(string html)
+{
+    try
+    {
+        HtmlParser parser = new HtmlParser();
+        IHtmlDocument document = parser.ParseDocument(html);
+        var x = document.QuerySelectorAll("img");
+        List<string> links = new List<string>();
+        List<string> titles = new List<string>();
+        foreach(var item in x)
+        {
+            titles.Add(item.GetAttribute("alt"));
+            links.Add(item.GetAttribute("src"));
+        }
+        return Tuple.Create(links, titles);
+    }
+    catch
+    {
+        List<string> nulllist = new List<string>();
+       return Tuple.Create(nulllist,nulllist);
     }
 
 

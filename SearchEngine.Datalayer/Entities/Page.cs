@@ -14,6 +14,8 @@ namespace SearchEngine.Datalayer.Entities
         public string title { get; set; }
         public string area { get; set; }
         public string url { get; set; }
+        public string ImagePageUrl { get; set; }
+        public bool IsImage { get; set; }
         public bool IsDone { get; set; } = false;
     }
 }
